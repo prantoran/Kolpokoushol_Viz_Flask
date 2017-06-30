@@ -1,0 +1,76 @@
+input.buttons{
+	background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 10%;
+}
+input.buttons:hover{
+    opacity: 0.5;
+}
+
+
+#sT{
+    position: relative;
+    left: 9%;
+    width: 100%;
+   
+    
+}
+
+#viz{
+    
+    transition: margin-left .5s;
+    margin-left: 15%;
+    width: 80%;
+}
+
+
+
+#options{
+    float: right;
+}
+
+#sidePaneButton{
+    position: relative;
+    margin-top: 5%;
+    left: 40%;
+    right: 0%;
+}
+
+
+#sidePaneClearButton{
+    position: relative;
+    margin-top: 5%;
+    left: 40%;
+    right: 0%;
+}
+
+#leftButtons{
+    position: relative;
+}
+
+
+#leftBar {
+    height: 100%; /* 100% Full-height */
+    width: 210px; /* 0 width - change this with JavaScript */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Stay on top */
+    top: 0;
+    left: 0;
+    background-color: #111; /* Black*/
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 60px; /* Place content 60px from the top */
+    transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+}
+
+#queryOutputBlock{
+    color: #818181;
+}
+
