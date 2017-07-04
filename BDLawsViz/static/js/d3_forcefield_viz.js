@@ -10,6 +10,11 @@ var db = 3;
 var etb = 10;
 var ld = 100;
 
+
+var tip, ex, ey;
+var link, node;
+
+
 var svg = d3.select("svg"),
     width = +svg.attr("width"),
     height = +svg.attr("height");
@@ -42,11 +47,65 @@ var simulation = d3.forceSimulation()
 d3.json("static/combined.json", function(error, graph) {
   if (error) throw error;
 
-  var tip;
-  var ex;
-  var ey;
+  configureLinks(graph);
 
-  var link = svg.append("g")
+  configureNodes(graph);
+
+  var text = svg.append("g").attr("class", "labels").selectAll("g")
+    .data(graph.nodes)
+  .enter().append("g");
+
+  text.append("text")
+    .attr("x", 14)
+    .attr("y", ".31em")
+    .style("font-family", "sans-serif")
+    .style("font-size", "0.7em")
+    .text(function(d) { return d.name; });
+
+  simulation
+      .nodes(graph.nodes)
+      .on("tick", ticked);
+
+  simulation.force("link")
+      .links(graph.links);
+
+  function ticked() {
+    link
+        .attr("x1", function(d) { return d.source.x; })
+        .attr("y1", function(d) { return d.source.y; })
+        .attr("x2", function(d) { return d.target.x; })
+        .attr("y2", function(d) { return d.target.y; });
+
+    node
+        .attr("cx", function(d) { return d.x; })
+        .attr("cy", function(d) { return d.y; });
+
+    text
+        .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+  }
+});
+
+function dragstarted(d) {
+  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+  d.fx = d.x;
+  d.fy = d.y;
+}
+
+function dragged(d) {
+  d.fx = d3.event.x;
+  d.fy = d3.event.y;
+}
+
+function dragended(d) {
+  if (!d3.event.active) simulation.alphaTarget(0);
+  d.fx = null;
+  d.fy = null;
+}
+
+function configureLinks(graph) {
+
+
+  link = svg.append("g")
       .attr("class", "links")
       .selectAll("line")
       .data(graph.links)
@@ -55,7 +114,14 @@ d3.json("static/combined.json", function(error, graph) {
       .attr('marker-end','url(#arrowhead)')
       .style('opacity',function(d){
         return Math.max(Math.min(0.9, d.value/mx), 0.1);
-      });
+      })
+
+
+  link.append("title")
+      .text(function (d) {return "cited";});
+
+
+  // beautifyLinks(graph);
 
   link.on("click",function(d){
     console.log("edges clicked");
@@ -63,7 +129,6 @@ d3.json("static/combined.json", function(error, graph) {
 
     ex = ( d.source.x + d.target.x ) /2;
     ey = ( d.source.y + d.target.y ) /2;
-
 
     console.log(d);
     tip  = svg.append("g")
@@ -142,8 +207,10 @@ d3.json("static/combined.json", function(error, graph) {
     rect.attr("width", bbox.width + 5)
         .attr("height", bbox.height + 5)
   });
+}
 
-  var node = svg.append("g")
+function configureNodes(graph) {
+  node = svg.append("g")
       .attr("class", "nodes")
     .selectAll("circle")
     .data(graph.nodes)
@@ -203,55 +270,39 @@ d3.json("static/combined.json", function(error, graph) {
     rect.attr("width", bbox.width + 5)
         .attr("height", bbox.height + 5)
   });
-
-
-  var text = svg.append("g").attr("class", "labels").selectAll("g")
-    .data(graph.nodes)
-  .enter().append("g");
-
-  text.append("text")
-    .attr("x", 14)
-    .attr("y", ".31em")
-    .style("font-family", "sans-serif")
-    .style("font-size", "0.7em")
-    .text(function(d) { return d.name; });
-
-  simulation
-      .nodes(graph.nodes)
-      .on("tick", ticked);
-
-  simulation.force("link")
-      .links(graph.links);
-
-  function ticked() {
-    link
-        .attr("x1", function(d) { return d.source.x; })
-        .attr("y1", function(d) { return d.source.y; })
-        .attr("x2", function(d) { return d.target.x; })
-        .attr("y2", function(d) { return d.target.y; });
-
-    node
-        .attr("cx", function(d) { return d.x; })
-        .attr("cy", function(d) { return d.y; });
-
-    text
-        .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-  }
-});
-
-function dragstarted(d) {
-  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-  d.fx = d.x;
-  d.fy = d.y;
 }
 
-function dragged(d) {
-  d.fx = d3.event.x;
-  d.fy = d3.event.y;
-}
 
-function dragended(d) {
-  if (!d3.event.active) simulation.alphaTarget(0);
-  d.fx = null;
-  d.fy = null;
+function beautifyLinks(graph) {
+  edgepaths = svg.selectAll(".edgepath")
+            .data(graph.links)
+            .enter()
+            .append('path')
+            .attrs({
+                'class': 'edgepath',
+                'fill-opacity': 0,
+                'stroke-opacity': 0,
+                'id': function (d, i) {return 'edgepath' + i}
+            })
+            .style("pointer-events", "none");
+
+  edgelabels = svg.selectAll(".edgelabel")
+            .data(graph.links)
+            .enter()
+            .append('text')
+            .style("pointer-events", "none")
+            .attrs({
+                'class': 'edgelabel',
+                'id': function (d, i) {return 'edgelabel' + i},
+                'font-size': 10,
+                'fill': '#111'
+            });
+
+  edgelabels.append('textPath')
+            .attr('xlink:href', function (d, i) {return '#edgepath' + i})
+            .style("text-anchor", "middle")
+            .style("pointer-events", "none")
+            .attr("startOffset", "50%")
+            .text(function (d) {return "cited"})
+
 }
