@@ -8,16 +8,34 @@ var mn = 1;
 var dtb = 150;
 var db = 3;
 var etb = 10;
+var ld = 100;
 
 var svg = d3.select("svg"),
     width = +svg.attr("width"),
     height = +svg.attr("height");
 
+
+svg.append("defs").append("marker")
+    .attr("id", "arrowhead")
+    .attr("viewBox", "0 -5 10 10")
+    .attr("refX", 14)
+    .attr("refY", 0)
+    .attr("markerWidth", 2)
+    .attr("markerHeight", 2)
+    .attr("orient", "auto")
+    .append("svg:path")
+    .attr("d", "M0,-5L10,0L0,5")
+    .style('stroke','none')
+    .attr('fill', '#123')
+    .style('stroke','white')
+    .style('opacity',.9);
+
 var color = d3.scaleOrdinal(d3.schemeCategory20);
 
 var simulation = d3.forceSimulation()
     //.force("link", d3.forceLink())
-    .force("link", d3.forceLink().id(function(d){return d.id;}).distance(function(d){return dtb*(((mx-mn+1)-d.value+db)/(mx-mn+1));}))
+    .force("link", d3.forceLink().id(function(d){return d.id;}).distance(function(d){
+      return Math.max(ld, dtb*(((mx-mn+1)-d.value+db)/(mx-mn+1)) );}))
     .force("charge", d3.forceManyBody())
     .force("center", d3.forceCenter(width / 2, height / 2));
 
@@ -30,12 +48,14 @@ d3.json("static/combined.json", function(error, graph) {
 
   var link = svg.append("g")
       .attr("class", "links")
-    .selectAll("line")
-    .data(graph.links)
-    .enter().append("line")
-      .attr("stroke-width", function(d) { return etb + d.value; });
-
-
+      .selectAll("line")
+      .data(graph.links)
+      .enter().append("line")
+      .attr("stroke-width", function(d) { return etb + d.value; })
+      .attr('marker-end','url(#arrowhead)')
+      .style('opacity',function(d){
+        return Math.max(Math.min(0.9, d.value/mx), 0.1);
+      });
 
   link.on("click",function(d){
     console.log("edges clicked");
