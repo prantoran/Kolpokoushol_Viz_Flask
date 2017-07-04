@@ -74,3 +74,10 @@ input.buttons:hover{
     color: #818181;
 }
 
+#navbarexpandbutton img {
+    width: 3%;
+    height: 6%;
+    position: fixed;
+    bottom: 50%;
+    left: 1%;
+}

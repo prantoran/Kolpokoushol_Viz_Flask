@@ -39,13 +39,14 @@ function shrinkMySearchBar(){
 	p.style="width:28%;";
 }
 
-function fullShrinkhrinkMySearchBar(){
-	var p = document.getElementById('shrinkButton');
-	p.style="visibility:hidden;";
-	p = document.getElementById('spreadButton');
-	p.style="visibility:visible;";
-	p = document.getElementById('mySearchBar');
-	p.style="width:10%;";
+function shrinkNavBar(){
+	document.getElementById("leftBar").style.width = "0px";
+
+}
+
+function expandNavBar(){
+	document.getElementById("leftBar").style.width = "210px";
+
 }
 
 function clearSearch(){

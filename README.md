@@ -76,6 +76,3 @@
         BEGIN
             select E.source as idS, L1.name as nameS, E.destination as idD, L2.name as nameD from bdlaws_edges as E LEFT OUTER JOIN lawIDs as L1 ON E.source = L1.id LEFT OUTER JOIN lawIDs as L2 ON E.destination = L2.id where E.destination = law_id;
         END$$
-        DELIMITER ;
-
-
