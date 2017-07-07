@@ -10,66 +10,162 @@ var db = 3;
 var etb = 10;
 var ld = 100;
 
+var getAllEdgeDisBuff = 100;
+
+var bx_op = '0.7';
+
+var nodeRadiusFunc;
+var edgeWidthFunc;
+var forceLinkDistanceFunc;
+
+var markerWidth;
+var markerHeight;
 
 var tip, ex, ey;
 var link, node;
 
+var svg;
+var color;
+var text;
+var simulation;
 
-var svg = d3.select("svg"),
+function reset() {
+    if (svg) {
+        svg.remove();
+    }
+    if (node) {
+        node.remove();
+    }
+    if (link) {
+        link.remove();
+    }
+    if (simulation) {
+        simulation = d3.forceSimulation()
+        //.force("link", d3.forceLink())
+            .force("link", null)
+            .force("charge", null)
+            .force("center", null);
+    }
+}
+
+function visualizeForceField(graph, searchFlag) {
+    console.log("Graph:", graph);
+
+     reset();
+
+    document.getElementById("viz").innerHTML = '<svg width="2500" height="1600"></svg>';
+    simulation = d3.forceSimulation();
+    svg = d3.select("svg"),
     width = +svg.attr("width"),
     height = +svg.attr("height");
 
 
-svg.append("defs").append("marker")
-    .attr("id", "arrowhead")
-    .attr("viewBox", "0 -5 10 10")
-    .attr("refX", 14)
-    .attr("refY", 0)
-    .attr("markerWidth", 2)
-    .attr("markerHeight", 2)
-    .attr("orient", "auto")
-    .append("svg:path")
-    .attr("d", "M0,-5L10,0L0,5")
-    .style('stroke','none')
-    .attr('fill', '#123')
-    .style('stroke','white')
-    .style('opacity',.9);
 
-var color = d3.scaleOrdinal(d3.schemeCategory20);
 
-var simulation = d3.forceSimulation()
-    //.force("link", d3.forceLink())
-    .force("link", d3.forceLink().id(function(d){return d.id;}).distance(function(d){
-      return Math.max(ld, dtb*(((mx-mn+1)-d.value+db)/(mx-mn+1)) );}))
-    .force("charge", d3.forceManyBody())
-    .force("center", d3.forceCenter(width / 2, height / 2));
+    if(searchFlag) {
+        nodeRadiusFunc = function(d) {
+            if( (Math.sqrt(64 + inDegreeSize[d.id]) ) > 8) {
+                return Math.floor(Math.sqrt(64 + inDegreeSize[d.id]) );
+            }
+            return 8;
+        };
+        edgeWidthFunc = function(d) { return etb + d.value; }
+        markerWidth = 2;
+        markerHeight = 2;
 
-d3.json("static/combined.json", function(error, graph) {
-  if (error) throw error;
+        forceLinkDistanceFunc = function(d){
+            return Math.max(ld, dtb*(((mx-mn+1)-d.value+db)/(mx-mn+1)) );
+        }
 
-  configureLinks(graph);
+        svg.append("defs").append("marker")
+            .attr("id", "arrowhead")
+            .attr("viewBox", "0 -5 10 10")
+            .attr("refX", 14)
+            .attr("refY", 0)
+            .attr("markerWidth", markerWidth)
+            .attr("markerHeight", markerHeight)
+            .attr("orient", "auto")
+            .append("svg:path")
+            .attr("d", "M0,-5L10,0L0,5")
+            .style('stroke', 'none')
+            .attr('fill', '#123')
+            .style('stroke', 'white')
+            .style('opacity', .9);
+    }
+    else {
+        nodeRadiusFunc = function(d) {
+            if( (Math.sqrt(16 + inDegreeSize[d.id]) ) > 4) {
+                return Math.floor(Math.sqrt(64 + inDegreeSize[d.id]) );
+            }
+            return 4;
 
-  configureNodes(graph);
+        };
+        edgeWidthFunc = function(d) { return Math.sqrt(d.value); }
 
-  var text = svg.append("g").attr("class", "labels").selectAll("g")
-    .data(graph.nodes)
-  .enter().append("g");
+        forceLinkDistanceFunc = function(d) {
+            return Math.max(ld, dtb*(((mx-mn+1)-d.value+db)/(mx-mn+1)) );
+        }
+    }
 
-  text.append("text")
-    .attr("x", 14)
-    .attr("y", ".31em")
-    .style("font-family", "sans-serif")
-    .style("font-size", "0.7em")
-    .text(function(d) { return d.name; });
 
-  simulation
+
+
+
+
+
+
+    svg.append("text")            // append text
+        .style("fill", "black")      // make the text black
+        .style("writing-mode", "lr") // set the writing mode
+        .attr("x", 1.9*(width/5) )         // set x position of left side of text
+        .attr("y", (height/12) )         // set y position of bottom of text
+        .text("Bangladesh Law Network")   // define the text to display
+        .style("font-size", "34px");
+
+    color = d3.scaleOrdinal(d3.schemeCategory20);
+
+    simulation = d3.forceSimulation()
+        .force("link", d3.forceLink()
+            .id(function(d){return d.id;})
+            .distance( forceLinkDistanceFunc ))
+        .force("charge", d3.forceManyBody())
+        .force("center", d3.forceCenter(width / 2, height / 2));
+
+
+
+
+    configureLinks(graph, edgeWidthFunc, searchFlag);
+
+    configureNodes(graph, searchFlag);
+
+    if(searchFlag) {
+        text = svg.append("g").attr("class", "labels").selectAll("g")
+            .data(graph.nodes)
+            .enter().append("g");
+
+        text.append("text")
+            .attr("x", 14)
+            .attr("y", ".31em")
+            .style("font-family", "sans-serif")
+            .style("font-size", "0.7em")
+            .text(function (d) {
+                return d.name;
+            });
+    }
+
+    simulation
       .nodes(graph.nodes)
       .on("tick", ticked);
 
-  simulation.force("link")
+    simulation.force("link")
       .links(graph.links);
 
-  function ticked() {
+
+
+
+}
+
+function ticked(searchFlag) {
     link
         .attr("x1", function(d) { return d.source.x; })
         .attr("y1", function(d) { return d.source.y; })
@@ -80,41 +176,57 @@ d3.json("static/combined.json", function(error, graph) {
         .attr("cx", function(d) { return d.x; })
         .attr("cy", function(d) { return d.y; });
 
-    text
-        .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-  }
-});
+    if(text){
+        text
+            .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+    }
+
+}
+
 
 function dragstarted(d) {
   if (!d3.event.active) simulation.alphaTarget(0.3).restart();
   d.fx = d.x;
   d.fy = d.y;
 }
-
 function dragged(d) {
   d.fx = d3.event.x;
   d.fy = d3.event.y;
 }
-
 function dragended(d) {
   if (!d3.event.active) simulation.alphaTarget(0);
   d.fx = null;
   d.fy = null;
 }
 
-function configureLinks(graph) {
+function configureLinks(graph, edgeWidthFunc, searchFlag) {
+
+    if(searchFlag) {
+        link = svg.append("g")
+          .attr("class", "links")
+          .selectAll("line")
+          .data(graph.links)
+          .enter().append("line")
+          .attr("stroke-width",  edgeWidthFunc)
+          .attr('marker-end','url(#arrowhead)')
+          .style('opacity',function(d){
+            return Math.max(Math.min(0.9, d.value/mx), 0.1);
+          });
+    }
+    else {
+        link = svg.append("g")
+          .attr("class", "links")
+          .selectAll("line")
+          .data(graph.links)
+          .enter().append("line")
+          .attr("stroke-width",  edgeWidthFunc)
+          .style('opacity',function(d){
+            return Math.max(Math.min(0.9, d.value/mx), 0.1);
+          });
+    }
 
 
-  link = svg.append("g")
-      .attr("class", "links")
-      .selectAll("line")
-      .data(graph.links)
-      .enter().append("line")
-      .attr("stroke-width", function(d) { return etb + d.value; })
-      .attr('marker-end','url(#arrowhead)')
-      .style('opacity',function(d){
-        return Math.max(Math.min(0.9, d.value/mx), 0.1);
-      })
+
 
 
   link.append("title")
@@ -135,8 +247,10 @@ function configureLinks(graph) {
       .attr("transform", "translate(" + ex  + "," + ey + ")");
 
      var rect = tip.append("rect")
-       .style("fill", "white")
-       .style("stroke", "steelblue");
+                .style("fill", "white")
+                .style("stroke", '#123')
+                .style('opacity', bx_op);
+
      console.log("rect pass");
 
 
@@ -215,7 +329,7 @@ function configureNodes(graph) {
     .selectAll("circle")
     .data(graph.nodes)
     .enter().append("circle")
-      .attr("r", 15)
+      .attr("r", nodeRadiusFunc)
       .attr("fill", function(d) { return color(d.group); })
       .call(d3.drag()
           .on("start", dragstarted)
@@ -223,14 +337,8 @@ function configureNodes(graph) {
           .on("end", dragended));
 
   node.append("title")
-      .text(function(d) { return d.id; });
+      .text(function(d) { return d.name; });
 
-  node.append("image")
-      .attr("xlink:href", "https://github.com/favicon.ico")
-      .attr("x", -8)
-      .attr("y", -8)
-      .attr("width", 16)
-      .attr("height", 16);
 
   node.on("click", function(d){
     console.log("node clicked");
@@ -240,8 +348,10 @@ function configureNodes(graph) {
       .attr("transform", "translate(" + d.x  + "," + d.y + ")");
 
     var rect = tip.append("rect")
-      .style("fill", "white")
-      .style("stroke", "steelblue");
+                .style("fill", "white")
+                .style("stroke", '#123')
+                .style('opacity', bx_op );
+
 
     tip.append("text")
       .text("Name: " + d.name)
@@ -259,7 +369,7 @@ function configureNodes(graph) {
       })
       .map(function(d1){
         return d1.target.name + " with weight " + d1.weight;
-      })
+      });
 
     tip.append("text")
       .text("Connected to: " + con.join(","))

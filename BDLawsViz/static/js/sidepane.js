@@ -6,17 +6,20 @@ function openNav() {
 
 /* Set the width of the side navigation to 0 */
 function closeNav() {
-	document.getElementById("leftBar").style.width = "210px";
+	document.getElementById("leftBar").style.width = "20%";
     document.getElementById("mySidenav").style.width = "0";
 }
 
 function openMySearchBar() {
 	document.getElementById("leftBar").style.width = "0px";
     document.getElementById("mySearchBar").style.width = "28%";
+    document.getElementById("searchTextLabel").innerHTML = "Enter id to search:";
+
+	setSearchJqueryClick();
 }
 
 function closeMySearchBar() {
-	document.getElementById("leftBar").style.width = "210px";
+	document.getElementById("leftBar").style.width = "20%";
     document.getElementById("mySearchBar").style.width = "0";
 }
 
@@ -28,6 +31,20 @@ function spreadMySearchBar() {
 	p = document.getElementById('mySearchBar');
 	p.style="width:100%;";
 }
+
+
+function openMyNetworkSearchBar() {
+	document.getElementById("leftBar").style.width = "0px";
+    document.getElementById("mySearchBar").style.width = "28%";
+    document.getElementById("searchTextLabel").innerHTML = "Enter keyword to search:";
+
+	setNetworkSearchJqueryClick();
+}
+
+
+
+
+
 
 
 function shrinkMySearchBar(){
@@ -45,7 +62,7 @@ function shrinkNavBar(){
 }
 
 function expandNavBar(){
-	document.getElementById("leftBar").style.width = "210px";
+	document.getElementById("leftBar").style.width = "20%";
 
 }
 

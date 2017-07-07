@@ -1,3 +1,5 @@
 lawenv
 lawenv/
 *.egg-info
+mongo_bson_files
+mongo_bson_files/
