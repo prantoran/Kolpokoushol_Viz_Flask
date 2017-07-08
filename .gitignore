@@ -3,3 +3,6 @@ lawenv/
 *.egg-info
 mongo_bson_files
 mongo_bson_files/
+en_core_web_sm-1.2.0*
+mongo_bson_files
+mongo_bson_files/

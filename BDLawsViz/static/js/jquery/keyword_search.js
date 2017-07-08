@@ -2,6 +2,8 @@
  * Created by pinku on 7/7/17.
  */
 
+var visited = {};
+
 function setNetworkSearchJqueryClick() {
     $(document).ready(function() {
 
@@ -99,13 +101,17 @@ function buildQueryParams(p) {
 }
 
 function produceKeywordSearchNetwork(res) {
-
+    visited = {};
     fNames = [];
     var u = res;
     var len = u.length;
 
     for (var i = 0; i < len; i++) {
-
+        if( u[i] in visited ) {
+            visited[u[i]] ++;
+            continue;
+        }
+        visited[u[i]] = 1;
         var v = {
             "id": u[i],
             "name": idNames[u[i]],
@@ -113,16 +119,19 @@ function produceKeywordSearchNetwork(res) {
         }
         fNames.push(v);
     }
-
     fEdges = [];
-    for(i = 0 ; i < len; i ++ ) {
-        for( j = 0 ; j < len ; j ++ ) {
+    len = fNames.length;
+    var x,y;
+    for(var i = 0 ; i < len; i ++ ) {
+        x = fNames[i].id;
+        for(var  j = 0 ; j < len ; j ++ ) {
             if ( i == j ) continue;
-            if(edgeGrid[u[i]][u[j]]) {
+            y = fNames[j].id;
+            if(edgeGrid[x][y]) {
                 var v = {
-                    "source": edgeGrid[u[i]][u[j]].source,
-                    "target": edgeGrid[u[i]][u[j]].target,
-                    "value": edgeGrid[u[i]][u[j]].value
+                    "source": x,
+                    "target": y,
+                    "value": edgeGrid[x][y].value
                 }
                 fEdges.push(v);
             }
@@ -133,6 +142,13 @@ function produceKeywordSearchNetwork(res) {
         "nodes": fNames,
         "links": fEdges
     };
-    console.log(graph);
-    visualizeForceField(graph, 1);
+    var sf = 1;
+    var coolf = 0;
+    if (graph.nodes.length > 150) {
+        sf = 0;
+        if(graph.links.length < 1000) {
+            coolf = 1;
+        }
+    }
+    visualizeForceField(graph, sf, coolf);
 }

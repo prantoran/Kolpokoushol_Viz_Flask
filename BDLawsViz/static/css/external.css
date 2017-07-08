@@ -1,3 +1,10 @@
+
+#body {
+    position: relative;
+}
+
+
+
 input.buttons{
 	background-color: #4CAF50;
     border: none;
@@ -27,7 +34,7 @@ input.buttons:hover{
 #viz{
     
     transition: margin-left .5s;
-    margin-left: 15%;
+    margin-left: 0%;
     width: 80%;
 }
 

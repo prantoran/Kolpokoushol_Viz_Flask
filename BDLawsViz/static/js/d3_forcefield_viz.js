@@ -3,6 +3,9 @@
  */
 
 
+var browserWidth = window.innerWidth.toString();
+var browserHeight = window.innerHeight.toString();
+
 var mx = 9;
 var mn = 1;
 var dtb = 150;
@@ -14,7 +17,6 @@ var getAllEdgeDisBuff = 100;
 
 var bx_op = '0.7';
 
-var nodeRadiusFunc;
 var edgeWidthFunc;
 var forceLinkDistanceFunc;
 
@@ -28,6 +30,34 @@ var svg;
 var color;
 var text;
 var simulation;
+
+// *** START Node Highlighting *** //
+
+var toggle = 0;
+
+function neighboring(a, b) {
+    if(a.id === b.id) return 1;
+    return edgeGrid[a.id][b.id] ? 1: 0;
+}
+
+function connectedNodes() {
+    if (toggle == 0) {
+        d = d3.select(this).node().__data__;
+        node.style("opacity", function (o) {
+            return neighboring(d, o) | neighboring(o, d) ? 0.8 : 0.1;
+        });
+        link.style("opacity", function (o) {
+            return d.index==o.source.index | d.index==o.target.index ? 0.8 : 0.1;
+        });
+        toggle = 1;
+    } else {
+        node.style("opacity", 0.8);
+        link.style("opacity", function(d){return d.opacity;});
+        toggle = 0;
+    }
+}
+
+// *** END Node Highlighting *** //
 
 function reset() {
     if (svg) {
@@ -48,27 +78,25 @@ function reset() {
     }
 }
 
-function visualizeForceField(graph, searchFlag) {
-    console.log("Graph:", graph);
-
+function visualizeForceField(graph, searchFlag, coolArrowFlag) {
      reset();
-
-    document.getElementById("viz").innerHTML = '<svg width="2500" height="1600"></svg>';
+    document.getElementById("viz").innerHTML = '<svg width="1300" height="630"></svg>'
     simulation = d3.forceSimulation();
     svg = d3.select("svg"),
     width = +svg.attr("width"),
     height = +svg.attr("height");
 
-
-
-
     if(searchFlag) {
-        nodeRadiusFunc = function(d) {
+
+        graph.nodes.forEach(function(d) {
             if( (Math.sqrt(64 + inDegreeSize[d.id]) ) > 8) {
-                return Math.floor(Math.sqrt(64 + inDegreeSize[d.id]) );
+                d.radius = Math.floor(Math.sqrt(100 + inDegreeSize[d.id]) );
             }
-            return 8;
-        };
+            else {
+                d.radius = 8;
+            }
+        });
+
         edgeWidthFunc = function(d) { return etb + d.value; }
         markerWidth = 2;
         markerHeight = 2;
@@ -93,31 +121,47 @@ function visualizeForceField(graph, searchFlag) {
             .style('opacity', .9);
     }
     else {
-        nodeRadiusFunc = function(d) {
+        graph.nodes.forEach(function(d) {
             if( (Math.sqrt(16 + inDegreeSize[d.id]) ) > 4) {
-                return Math.floor(Math.sqrt(64 + inDegreeSize[d.id]) );
+                d.radius = Math.floor(Math.sqrt(64 + inDegreeSize[d.id]) );
             }
-            return 4;
+            else {
+                d.radius = 4;
+            }
+        });
 
-        };
-        edgeWidthFunc = function(d) { return Math.sqrt(d.value); }
+        edgeWidthFunc = function(d) { return Math.sqrt(d.value); };
 
         forceLinkDistanceFunc = function(d) {
             return Math.max(ld, dtb*(((mx-mn+1)-d.value+db)/(mx-mn+1)) );
         }
+
+        if( coolArrowFlag) {
+            svg.append("defs").selectAll("marker")
+                .data(["suit", "licensing", "resolved"])
+                .enter().append("marker")
+                .attr("id", function(d) { return d; })
+                .attr("viewBox", "0 -5 10 10")
+                .attr("refX", 20)
+                .attr("refY", 0)
+                .attr("markerWidth", markerWidth)
+                .attr("markerHeight", markerHeight)
+                .attr("orient", "auto")
+                .append("path")
+                .attr("d", "M0,-5L10,0L0,5 L10,0 L0, -5")
+                .style("stroke", "#123")
+                .style("opacity", "0.6");
+        }
+
     }
-
-
-
-
-
-
-
+    graph.links.forEach(function (d) {
+        d.opacity = Math.round( 10 * Math.max(Math.min(0.9, d.value/mx), 0.1) ) / 10;
+    });
 
     svg.append("text")            // append text
-        .style("fill", "black")      // make the text black
+        .style("fill", "#0B3C22" )      // make the text black
         .style("writing-mode", "lr") // set the writing mode
-        .attr("x", 1.9*(width/5) )         // set x position of left side of text
+        .attr("x", 1.8*(width/5) )         // set x position of left side of text
         .attr("y", (height/12) )         // set y position of bottom of text
         .text("Bangladesh Law Network")   // define the text to display
         .style("font-size", "34px");
@@ -130,8 +174,6 @@ function visualizeForceField(graph, searchFlag) {
             .distance( forceLinkDistanceFunc ))
         .force("charge", d3.forceManyBody())
         .force("center", d3.forceCenter(width / 2, height / 2));
-
-
 
 
     configureLinks(graph, edgeWidthFunc, searchFlag);
@@ -160,9 +202,6 @@ function visualizeForceField(graph, searchFlag) {
     simulation.force("link")
       .links(graph.links);
 
-
-
-
 }
 
 function ticked(searchFlag) {
@@ -173,8 +212,8 @@ function ticked(searchFlag) {
         .attr("y2", function(d) { return d.target.y; });
 
     node
-        .attr("cx", function(d) { return d.x; })
-        .attr("cy", function(d) { return d.y; });
+        .attr("cx", function(d) { return d.x = Math.max(d.radius, Math.min(width - d.radius, d.x)); })
+        .attr("cy", function(d) { return d.y = Math.max(d.radius, Math.min(height - d.radius, d.y)); });
 
     if(text){
         text
@@ -209,9 +248,7 @@ function configureLinks(graph, edgeWidthFunc, searchFlag) {
           .enter().append("line")
           .attr("stroke-width",  edgeWidthFunc)
           .attr('marker-end','url(#arrowhead)')
-          .style('opacity',function(d){
-            return Math.max(Math.min(0.9, d.value/mx), 0.1);
-          });
+          .style('opacity',function(d){return d.opacity;});
     }
     else {
         link = svg.append("g")
@@ -220,20 +257,12 @@ function configureLinks(graph, edgeWidthFunc, searchFlag) {
           .data(graph.links)
           .enter().append("line")
           .attr("stroke-width",  edgeWidthFunc)
-          .style('opacity',function(d){
-            return Math.max(Math.min(0.9, d.value/mx), 0.1);
-          });
+            .style("marker-end",  "url(#suit)") // Modified line
+          .style('opacity',function(d){return d.opacity;});
     }
-
-
-
-
 
   link.append("title")
       .text(function (d) {return "cited";});
-
-
-  // beautifyLinks(graph);
 
   link.on("click",function(d){
     console.log("edges clicked");
@@ -329,19 +358,23 @@ function configureNodes(graph) {
     .selectAll("circle")
     .data(graph.nodes)
     .enter().append("circle")
-      .attr("r", nodeRadiusFunc)
+      .attr("r", function(d){return d.radius;})
       .attr("fill", function(d) { return color(d.group); })
+      .style("stroke", function(d) { return d3.rgb(color(d.group)).darker(); })
       .call(d3.drag()
           .on("start", dragstarted)
           .on("drag", dragged)
-          .on("end", dragended));
+          .on("end", dragended))
+        .on('dblclick', connectedNodes);;
+
 
   node.append("title")
       .text(function(d) { return d.name; });
 
 
+
+
   node.on("click", function(d){
-    console.log("node clicked");
     if (tip) tip.remove();
 
     tip  = svg.append("g")
@@ -358,61 +391,35 @@ function configureNodes(graph) {
       .attr("dy", "1em")
       .attr("x", 5);
 
+
+
+
     tip.append("text")
       .text("Group: " + d.group)
       .attr("dy", "2em")
       .attr("x", 5);
 
-    var con = graph.links
-      .filter(function(d1){
-        return d1.source.id === d.id;
-      })
-      .map(function(d1){
-        return d1.target.name + " with weight " + d1.weight;
-      });
+    if(outDegreeSize[d.id]) {
+        tip.append("text")
+          .text("Cited: " + outDegreeSize[d.id].toString() + " law(s).")
+          .attr("dy", "3em")
+          .attr("x", 5);
+    }
+
+    if(inDegreeSize[d.id]) {
+        tip.append("text")
+          .text("Cited by: " + inDegreeSize[d.id].toString() + " law(s).")
+          .attr("dy", "4em")
+          .attr("x", 5);
+    }
 
     tip.append("text")
-      .text("Connected to: " + con.join(","))
-      .attr("dy", "3em")
+      .text("Id: " + d.id)
+      .attr("dy", "5em")
       .attr("x", 5);
 
     var bbox = tip.node().getBBox();
     rect.attr("width", bbox.width + 5)
         .attr("height", bbox.height + 5)
   });
-}
-
-
-function beautifyLinks(graph) {
-  edgepaths = svg.selectAll(".edgepath")
-            .data(graph.links)
-            .enter()
-            .append('path')
-            .attrs({
-                'class': 'edgepath',
-                'fill-opacity': 0,
-                'stroke-opacity': 0,
-                'id': function (d, i) {return 'edgepath' + i}
-            })
-            .style("pointer-events", "none");
-
-  edgelabels = svg.selectAll(".edgelabel")
-            .data(graph.links)
-            .enter()
-            .append('text')
-            .style("pointer-events", "none")
-            .attrs({
-                'class': 'edgelabel',
-                'id': function (d, i) {return 'edgelabel' + i},
-                'font-size': 10,
-                'fill': '#111'
-            });
-
-  edgelabels.append('textPath')
-            .attr('xlink:href', function (d, i) {return '#edgepath' + i})
-            .style("text-anchor", "middle")
-            .style("pointer-events", "none")
-            .attr("startOffset", "50%")
-            .text(function (d) {return "cited"})
-
 }

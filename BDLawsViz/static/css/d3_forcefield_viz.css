@@ -4,8 +4,9 @@
 }
 
 .nodes circle {
-  stroke: #111;
+  stroke: #EEF9FE;
   stroke-width: 1.5px;
+  opacity: 0.8;
 }
 
 .link {

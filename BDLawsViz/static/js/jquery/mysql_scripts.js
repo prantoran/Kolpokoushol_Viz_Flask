@@ -81,22 +81,18 @@ $(document).ready(function() {
                     "value": Math.floor(Math.random() * mxrndmvalue) + 1
                 }
                 var w = {
-                    "source": u[i].source,
-                    "target": u[i].destination,
                     "value": Math.floor(Math.random() * mxrndmvalue) + 1
                 }
                 edgeGrid[u[i].source][u[i].destination] = w;
                 fEdges.push(v);
             }
         }
-        console.log(outDegreeSize);
         graph = {
             "nodes": fNames,
             "links": fEdges
         };
-        console.log(idNames);
         graph2 = graph;
-        visualizeForceField(graph, 0);
+        visualizeForceField(graph, 0, 0);
     });
 
 });
