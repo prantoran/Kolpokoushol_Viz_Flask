@@ -92,7 +92,8 @@ $(document).ready(function() {
             "links": fEdges
         };
         graph2 = graph;
-        visualizeForceField(graph, 0, 0);
+        console.log(graph);
+        visualizeForceField(graph, 8, 0, 0);
     });
 
 });

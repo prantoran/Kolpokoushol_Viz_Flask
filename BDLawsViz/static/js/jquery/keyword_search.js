@@ -150,5 +150,5 @@ function produceKeywordSearchNetwork(res) {
             coolf = 1;
         }
     }
-    visualizeForceField(graph, sf, coolf);
+    visualizeForceField(graph, Math.min(10, Math.max(0, 4000/graph.nodes.length) ) , sf, coolf);
 }

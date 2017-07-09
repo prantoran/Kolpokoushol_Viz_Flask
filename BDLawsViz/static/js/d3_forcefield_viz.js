@@ -14,6 +14,7 @@ var etb = 10;
 var ld = 100;
 
 var getAllEdgeDisBuff = 100;
+var minRadiusSQ;
 
 var bx_op = '0.7';
 
@@ -78,24 +79,26 @@ function reset() {
     }
 }
 
-function visualizeForceField(graph, searchFlag, coolArrowFlag) {
+function visualizeForceField(graph, minRadius, searchFlag, coolArrowFlag) {
      reset();
+     minRadiusSQ = minRadius*minRadius;
+
     document.getElementById("viz").innerHTML = '<svg width="1300" height="630"></svg>'
     simulation = d3.forceSimulation();
     svg = d3.select("svg"),
     width = +svg.attr("width"),
     height = +svg.attr("height");
 
-    if(searchFlag) {
+    graph.nodes.forEach(function(d) {
+        if( (Math.sqrt(minRadiusSQ + inDegreeSize[d.id]) ) > minRadius) {
+            d.radius = Math.floor(Math.sqrt(minRadiusSQ + inDegreeSize[d.id]) );
+        }
+        else {
+            d.radius = minRadius;
+        }
+    });
 
-        graph.nodes.forEach(function(d) {
-            if( (Math.sqrt(64 + inDegreeSize[d.id]) ) > 8) {
-                d.radius = Math.floor(Math.sqrt(100 + inDegreeSize[d.id]) );
-            }
-            else {
-                d.radius = 8;
-            }
-        });
+    if(searchFlag) {
 
         edgeWidthFunc = function(d) { return etb + d.value; }
         markerWidth = 2;
@@ -121,15 +124,6 @@ function visualizeForceField(graph, searchFlag, coolArrowFlag) {
             .style('opacity', .9);
     }
     else {
-        graph.nodes.forEach(function(d) {
-            if( (Math.sqrt(16 + inDegreeSize[d.id]) ) > 4) {
-                d.radius = Math.floor(Math.sqrt(64 + inDegreeSize[d.id]) );
-            }
-            else {
-                d.radius = 4;
-            }
-        });
-
         edgeWidthFunc = function(d) { return Math.sqrt(d.value); };
 
         forceLinkDistanceFunc = function(d) {
