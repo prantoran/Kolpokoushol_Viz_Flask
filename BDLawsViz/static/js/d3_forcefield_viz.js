@@ -2,7 +2,6 @@
  * Created by pinku on 7/3/17.
  */
 
-
 var browserWidth = window.innerWidth.toString();
 var browserHeight = window.innerHeight.toString();
 
@@ -10,16 +9,11 @@ var mx = 9;
 var mn = 1;
 var dtb = 150;
 var db = 3;
-var etb = 10;
 var ld = 100;
 
-var getAllEdgeDisBuff = 100;
 var minRadiusSQ;
 
 var bx_op = '0.7';
-
-var edgeWidthFunc;
-var forceLinkDistanceFunc;
 
 var markerWidth;
 var markerHeight;
@@ -98,20 +92,22 @@ function visualizeForceField(graph, minRadius, searchFlag, coolArrowFlag) {
         }
     });
 
+    graph.links.forEach(function(d){
+        d.forceLinkDistance = Math.max(ld, dtb*(((mx-mn+1)-d.value+db)/(mx-mn+1)) );
+        d.title = d.source.toString() + " -> "+d.target.toString();
+        d.linkWidth = Math.sqrt(minRadius + d.value);
+        d.opacity = Math.round( 10 * Math.max(Math.min(0.9, d.value/mx), 0.1) ) / 10;
+    });
+
     if(searchFlag) {
 
-        edgeWidthFunc = function(d) { return etb + d.value; }
         markerWidth = 2;
         markerHeight = 2;
-
-        forceLinkDistanceFunc = function(d){
-            return Math.max(ld, dtb*(((mx-mn+1)-d.value+db)/(mx-mn+1)) );
-        }
 
         svg.append("defs").append("marker")
             .attr("id", "arrowhead")
             .attr("viewBox", "0 -5 10 10")
-            .attr("refX", 14)
+            .attr("refX", 20)
             .attr("refY", 0)
             .attr("markerWidth", markerWidth)
             .attr("markerHeight", markerHeight)
@@ -124,11 +120,6 @@ function visualizeForceField(graph, minRadius, searchFlag, coolArrowFlag) {
             .style('opacity', .9);
     }
     else {
-        edgeWidthFunc = function(d) { return Math.sqrt(d.value); };
-
-        forceLinkDistanceFunc = function(d) {
-            return Math.max(ld, dtb*(((mx-mn+1)-d.value+db)/(mx-mn+1)) );
-        }
 
         if( coolArrowFlag) {
             svg.append("defs").selectAll("marker")
@@ -148,9 +139,6 @@ function visualizeForceField(graph, minRadius, searchFlag, coolArrowFlag) {
         }
 
     }
-    graph.links.forEach(function (d) {
-        d.opacity = Math.round( 10 * Math.max(Math.min(0.9, d.value/mx), 0.1) ) / 10;
-    });
 
     svg.append("text")            // append text
         .style("fill", "#0B3C22" )      // make the text black
@@ -165,12 +153,12 @@ function visualizeForceField(graph, minRadius, searchFlag, coolArrowFlag) {
     simulation = d3.forceSimulation()
         .force("link", d3.forceLink()
             .id(function(d){return d.id;})
-            .distance( forceLinkDistanceFunc ))
+            .distance( function(d){return d.forceLinkDistance;} ))
         .force("charge", d3.forceManyBody())
         .force("center", d3.forceCenter(width / 2, height / 2));
 
 
-    configureLinks(graph, edgeWidthFunc, searchFlag);
+    configureLinks(graph, searchFlag);
 
     configureNodes(graph, searchFlag);
 
@@ -216,7 +204,6 @@ function ticked(searchFlag) {
 
 }
 
-
 function dragstarted(d) {
   if (!d3.event.active) simulation.alphaTarget(0.3).restart();
   d.fx = d.x;
@@ -232,7 +219,7 @@ function dragended(d) {
   d.fy = null;
 }
 
-function configureLinks(graph, edgeWidthFunc, searchFlag) {
+function configureLinks(graph, searchFlag) {
 
     if(searchFlag) {
         link = svg.append("g")
@@ -240,7 +227,7 @@ function configureLinks(graph, edgeWidthFunc, searchFlag) {
           .selectAll("line")
           .data(graph.links)
           .enter().append("line")
-          .attr("stroke-width",  edgeWidthFunc)
+          .attr("stroke-width", function(d){return d.linkWidth;})
           .attr('marker-end','url(#arrowhead)')
           .style('opacity',function(d){return d.opacity;});
     }
@@ -250,22 +237,20 @@ function configureLinks(graph, edgeWidthFunc, searchFlag) {
           .selectAll("line")
           .data(graph.links)
           .enter().append("line")
-          .attr("stroke-width",  edgeWidthFunc)
+          .attr("stroke-width", function(d){return d.linkWidth;})
             .style("marker-end",  "url(#suit)") // Modified line
           .style('opacity',function(d){return d.opacity;});
     }
 
   link.append("title")
-      .text(function (d) {return "cited";});
+      .text(function (d) {return d.title;});
 
   link.on("click",function(d){
-    console.log("edges clicked");
     if (tip) tip.remove();
 
     ex = ( d.source.x + d.target.x ) /2;
     ey = ( d.source.y + d.target.y ) /2;
 
-    console.log(d);
     tip  = svg.append("g")
       .attr("transform", "translate(" + ex  + "," + ey + ")");
 
@@ -273,9 +258,6 @@ function configureLinks(graph, edgeWidthFunc, searchFlag) {
                 .style("fill", "white")
                 .style("stroke", '#123')
                 .style('opacity', bx_op);
-
-     console.log("rect pass");
-
 
 
     tip.append("text")
@@ -347,26 +329,22 @@ function configureLinks(graph, edgeWidthFunc, searchFlag) {
 }
 
 function configureNodes(graph) {
-  node = svg.append("g")
-      .attr("class", "nodes")
-    .selectAll("circle")
-    .data(graph.nodes)
-    .enter().append("circle")
-      .attr("r", function(d){return d.radius;})
-      .attr("fill", function(d) { return color(d.group); })
-      .style("stroke", function(d) { return d3.rgb(color(d.group)).darker(); })
-      .call(d3.drag()
-          .on("start", dragstarted)
-          .on("drag", dragged)
-          .on("end", dragended))
+    node = svg.append("g")
+        .attr("class", "nodes")
+        .selectAll("circle")
+        .data(graph.nodes)
+        .enter().append("circle")
+        .attr("r", function(d){return d.radius;})
+        .attr("fill", function(d) { return color(d.group); })
+        .style("stroke", function(d) { return d3.rgb(color(d.group)).darker(); })
+        .call(d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended))
         .on('dblclick', connectedNodes);;
-
 
   node.append("title")
       .text(function(d) { return d.name; });
-
-
-
 
   node.on("click", function(d){
     if (tip) tip.remove();
