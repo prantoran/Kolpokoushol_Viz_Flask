@@ -21,6 +21,7 @@ var outDegreeSize = [];
 var  mxrndmvalue = 10;
 
 $(document).ready(function() {
+
     var names_ret = {
         response: "",
         is_error: false,
@@ -31,6 +32,11 @@ $(document).ready(function() {
         is_error: false,
         error: ""
     };
+
+
+
+
+
     $.when(getAllNames(names_ret), getAllEdges(edges_ret)).done(function (a1, a2) {
 
         var u = names_ret.response;
