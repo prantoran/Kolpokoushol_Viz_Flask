@@ -3,9 +3,24 @@
     position: relative;
 }
 
+.footer a {
+    position: absolute;
+    bottom: 5%;
+    right: 5%;
+    padding: 1px 1px 1px 32px;
+    text-decoration: none;
+    font-size: 10px;
+    color: #818181;
+    display: block;
+    transition: 0.3s
+}
 
+.footer a p {
+    font-size: 16px;
+}
 
 input.buttons{
+
 	background-color: #4CAF50;
     border: none;
     color: white;
@@ -27,12 +42,12 @@ input.buttons:hover{
     position: relative;
     left: 9%;
     width: 100%;
-   
-    
+
+
 }
 
 #viz{
-    
+
     transition: margin-left .5s;
     margin-left: 0%;
     width: 80%;

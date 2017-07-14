@@ -1,48 +1,76 @@
-<!doctype html>
+<!DOCTYPE html>
+<html lang="en">
 
-<html>
-    <head>
+<head>
+    <meta charset="utf-8">
 
-        <meta charset="utf-8">
-
-
-        <script src="static/lib/jquery-3.2.1.js"></script>
+    <title>Bangladesh Law Network</title>
 
 
-        <script src="static/lib/d3.js"></script>
-        <script src="http://d3js.org/d3-selection-multi.v1.js"></script>
+    <!--<link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet"> -->
+   <!-- <link href="../static/css/signup.css" rel="stylesheet"> -->
 
-        <!-- <script src="//d3js.org/d3.v3.min.js"></script>-->
+    <script src="static/lib/jquery-3.2.1.js"></script>
+    <script src="static/lib/d3.js"></script>
+    <script src="http://d3js.org/d3-selection-multi.v1.js"></script>
 
-
-        <!-- <script src="static/lib/d3plus/d3.js"></script>
-         <script src="static/lib/d3plus/d3plus.js"></script>
-        <!-- <script src="https://d3js.org/d3.v4.js"></script> -->
-
-
-        <!--  <script src="static/js/d3_ring_viz.js"></script> -->
-        <script src="static/js/effects.js"></script>
-        <script src="static/js/d3_forcefield_viz.js"></script>
-        <!-- -->
-
-        <script src="static/js/sidepane.js"></script>
-        <script src="static/js/jquery/mysql_scripts.js"></script>
-        <script src="static/js/jquery/mongo_scripts.js"></script>
-        <script src="static/js/jquery/id_search.js"></script>
-        <script src="static/js/jquery/keyword_search.js"></script>
-
-        <!-- -->
-
-        <link rel="stylesheet" type="text/css" href="static/css/external.css">
-        <link rel="stylesheet" type="text/css" href="static/css/sidepanecss.css">
-        <link rel="stylesheet" type="text/css" href="static/css/d3_forcefield_viz.css">
-
-        <!-- -->
-    </head>
-    <body>
+    <!-- <script src="//d3js.org/d3.v3.min.js"></script>-->
 
 
-        <div id="viz">
+    <!-- <script src="static/lib/d3plus/d3.js"></script>
+    <script src="static/lib/d3plus/d3plus.js"></script>
+    <!-- <script src="https://d3js.org/d3.v4.js"></script> -->
+
+
+    <!--  <script src="static/js/d3_ring_viz.js"></script> -->
+    <script src="static/js/effects.js"></script>
+    <script src="static/js/d3_forcefield_viz.js"></script>
+    <!-- -->
+
+    <script src="static/js/sidepane.js"></script>
+    <script src="static/js/jquery/mysql_scripts.js"></script>
+    <script src="static/js/jquery/mongo_scripts.js"></script>
+    <script src="static/js/jquery/id_search.js"></script>
+    <script src="static/js/jquery/keyword_search.js"></script>
+    <script src="static/js/jquery/account.js"></script>
+
+
+    <!-- -->
+
+    <link rel="stylesheet" type="text/css" href="static/css/external.css">
+    <link rel="stylesheet" type="text/css" href="static/css/sidepanecss.css">
+    <link rel="stylesheet" type="text/css" href="static/css/d3_forcefield_viz.css">
+
+    <!-- -->
+
+
+
+
+</head>
+
+<body>
+<!--
+    <div class="container">
+        <!--<div class="header">
+            <nav>
+                <ul class="nav nav-pills pull-right">
+                    <li role="presentation" class="active"><a href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </nav>
+            <h3 class="text-muted">Law Network</h3>
+        </div>
+
+
+
+
+
+
+    </div> -->
+
+
+    <div id="viz">
 
         </div>
 
@@ -51,10 +79,14 @@
 
             <a href="#" onclick="clearVisualization()">Clear Visuation</a>
 
-            <a href="#" onclick="reloadVisualization()">Reload Visuation</a>
+
+            <a href="/logout" >Reload Visuation</a>
+
 
             <footer class="footer">
-                <p>&copy; KolpoKoushol 2017</p>
+                <a href="#">
+                    <p>&copy; KolpoKoushol 2017</p>
+                </a>
             </footer>
         </div>
 
@@ -105,12 +137,16 @@
             </div>
 
             <footer class="footer">
-                <p>&copy; KolpoKoushol 2017</p>
+                <a href="#">
+                    <p>&copy; KolpoKoushol 2017</p>
+                </a>
             </footer>
 
         </div>
 
-
+        <script>
+        console.log("signin token: ");
+        console.log( signin_token)</script>
         <div id = "leftBar" class="sidenav">
             <div>
                 <a href="javascript:void(0)" class="closebtn" onclick="shrinkNavBar()">&times;</a>
@@ -131,11 +167,18 @@
                             <input id="leftButtons3" style="width:100%;" type = button  class = "buttons" value = "Network Search Pane" onclick="openMyNetworkSearchBar()">
                         </td>
                     </tr>
+                    <tr>
+                        <td>
+                            <input id="logoutButton" style="width:100%;" type = button  class = "buttons" value = "Log Out" onclick="window.location='logout';">
+                        </td>
+                    </tr>
                 </table>
             </div>
 
             <footer class="footer">
-                <p>&copy; KolpoKoushol 2017</p>
+                <a href="#">
+                    <p>&copy; KolpoKoushol 2017</p>
+                </a>
             </footer>
         </div>
         <div id = "navbarexpandbutton" >
@@ -144,13 +187,6 @@
 
             </div>
         </div>
-
-
-
-    </body>
-
-
-
-
+</body>
 
 </html>

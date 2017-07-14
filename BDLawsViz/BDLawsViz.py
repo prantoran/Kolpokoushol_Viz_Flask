@@ -10,9 +10,27 @@ from flask.ext.mysql import MySQL
 from flask import Flask, request, json, session, g, redirect, url_for, abort, \
      render_template, flash, session
 
+from flask.ext.login import LoginManager, UserMixin, \
+                                login_required, login_user, logout_user
+
+import random
+import sys
+
+
+MOD = 1000000007
+BASE = 31
+YCOOR = 7
+
 
 
 app = Flask(__name__) # create the application instance :)
+
+
+# config
+app.config.update(
+    DEBUG = True,
+    SECRET_KEY = 'secret_xxx'
+)
 
 app.secret_key = 'PizzaHut e onekdin pizza khai nai :3'
 
@@ -32,6 +50,17 @@ db = client.law
 bigrams = db.bigrams
 trigrams = db.trigrams
 stemmer = PorterStemmer()
+
+
+
+# flask-login
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(user_id)
+
 
 ## Routes ##
 
@@ -82,6 +111,7 @@ def validatelogin():
     try:
         _username = request.form['inputEmail']
         _password = request.form['inputPassword']
+        print("username:"+str(_username))
 
         # connect to mysql
 
@@ -92,37 +122,65 @@ def validatelogin():
 
         if len(data) > 0:
             if data[0][3] == _password:
+                token = (random.randint(1, MOD) * BASE + YCOOR ) % MOD
+                while session.get(token):
+                    print("hash collision at /validatelogin")
+                    token = (random.randint(1, MOD) * BASE + YCOOR ) % MOD
+                session[token] = 1
+                print(session.get(token))
                 session['user'] = data[0][0]
-                return redirect('/userhome')
+                return json.dumps(token)
             else:
-                return render_template('error.html', error='Wrong Email address or Password.')
+                return json.dumps('Wrong Email address or Password.')
         else:
-            return render_template('error.html', error='Wrong Email address or Password.')
+            return json.dumps('Wrong Email address or Password.')
 
     except Exception as e:
-        return render_template('error.html', error=str(e))
+        return json.dumps(str(e))
     finally:
         cursor.close()
         con.close()
 
 
-@app.route('/userhome')
-def userhome():
+@app.route('/home', methods=['GET','POST'])
+def home():
     if session.get('user'):
-        return render_template('userhome.html')
+        return render_template('home.html')
     else:
         return render_template('error.html', error='Unauthorized Access')
 
 
-@app.route('/logout')
+
+# @app.route('/home', methods=['POST','GET'])
+# def home():
+#
+#     if request.method == 'GET':
+#         return render_template('signin.html')
+#
+#
+#
+#     tok = request.form['token']
+#     print("sesiontoken: " + str(session.get(tok)))
+#     print("tok:" + str(tok))
+#     if session.get(tok):
+#         return json.dumps(1)
+#     else:
+#         return json.dumps(2)
+
+
+
+@app.route('/logout', methods=['GET','POST'])
 def logout():
     session.pop('user', None)
     return redirect('/')
 
+@app.route('/error')
+def error():
+    return render_template('error.html')
 
 @app.route("/vis")
 def vis():
-    return render_template('vis.html')
+    return json.dumps(1)
 
 
 @app.route('/getallnames', methods=['GET'])

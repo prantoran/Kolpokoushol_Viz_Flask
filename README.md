@@ -18,15 +18,16 @@
     $ pip install flask-mysql
     $ pip install pymongo
     $ pip install nltk
+	$ pip install flask-login
 
 #### Installing spaCy
 
     $ pip install spacy
     $ python -m spacy download en
 ( first download the en_core_web_sm-1.2.0.tar.gz package from https://github.com/explosion/spacy-models )
-    $ pip install en_core_web_sm-1.2.0.tar.gz 
-	 
-	
+    $ pip install en_core_web_sm-1.2.0.tar.gz
+
+
 
 ### Installing everything automatically
 
@@ -45,23 +46,23 @@
     - Used MySQL stored procedures
 
     - Used spaCy
-	
+
 -used MongoDB for performing searches
 
 
 ## MongoDB
 
 - Instantiating Mongo Server
-	
+
 mongod --dbpath /path/to/mongodb --port mongo_port
 
-or 
+or
 
 source scripts/build.sh
 
 
 - Import bson using mongorestore:
-	
+
 mongorestore --port mongo_port db_name -c collection_name path/file.bson
 
 eg.
@@ -186,7 +187,3 @@ mongorestore --port 4000 -d law -c laws `pwd`/laws.bson
 ## Trivial
 
 ###
-
-
-
-
