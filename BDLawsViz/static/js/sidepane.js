@@ -51,7 +51,7 @@ function shrinkMySearchBar(){
 	var p = document.getElementById('shrinkButton');
 	p.style="visibility:hidden;";
 	p = document.getElementById('spreadButton');
-	p.style="visibility:visible;";	
+	p.style="visibility:visible;";
 	p = document.getElementById('mySearchBar');
 	p.style="width:28%;";
 }

@@ -76,8 +76,8 @@ function reset() {
 function visualizeForceField(graph, minRadius, searchFlag, coolArrowFlag) {
      reset();
      minRadiusSQ = minRadius*minRadius;
-
-    document.getElementById("viz").innerHTML = '<svg width="1300" height="630"></svg>'
+     console.log("widht:" + browserWidth);
+    document.getElementById("viz").innerHTML = '<svg width='+browserWidth +' height='+browserHeight+' ></svg>'
     simulation = d3.forceSimulation();
     svg = d3.select("svg"),
     width = +svg.attr("width"),

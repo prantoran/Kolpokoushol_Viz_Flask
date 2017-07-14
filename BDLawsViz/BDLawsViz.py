@@ -16,15 +16,7 @@ from flask.ext.login import LoginManager, UserMixin, \
 import random
 import sys
 
-
-MOD = 1000000007
-BASE = 31
-YCOOR = 7
-
-
-
 app = Flask(__name__) # create the application instance :)
-
 
 # config
 app.config.update(
@@ -119,17 +111,19 @@ def validatelogin():
         cursor = con.cursor()
         cursor.callproc('sp_validateLogin', (_username,))
         data = cursor.fetchall()
+        print(data[0][0])
+        print(data[0][1])
+        print(data[0][2])
+
 
         if len(data) > 0:
             if data[0][3] == _password:
-                token = (random.randint(1, MOD) * BASE + YCOOR ) % MOD
-                while session.get(token):
-                    print("hash collision at /validatelogin")
-                    token = (random.randint(1, MOD) * BASE + YCOOR ) % MOD
-                session[token] = 1
-                print(session.get(token))
-                session['user'] = data[0][0]
-                return json.dumps(token)
+                user = {
+                    'name': data[0][1],
+                    'email': data[0][2]
+                }
+                session['user'] = data[0][1]
+                return json.dumps(user)
             else:
                 return json.dumps('Wrong Email address or Password.')
         else:
