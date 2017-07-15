@@ -76,7 +76,6 @@ function reset() {
 function visualizeForceField(graph, minRadius, searchFlag, coolArrowFlag) {
      reset();
      minRadiusSQ = minRadius*minRadius;
-     console.log("widht:" + browserWidth);
     document.getElementById("viz").innerHTML = '<svg width='+browserWidth +' height='+browserHeight+' ></svg>'
     simulation = d3.forceSimulation();
     svg = d3.select("svg"),
@@ -347,6 +346,16 @@ function configureNodes(graph) {
       .text(function(d) { return d.name; });
 
   node.on("click", function(d){
+
+    eventObj = {
+        type: EVENT_NODE,
+        id: d.id
+    }
+    console.log(eventObj);
+
+    addEventToCookie(eventObj,1);
+
+
     if (tip) tip.remove();
 
     tip  = svg.append("g")

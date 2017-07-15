@@ -56,9 +56,16 @@ def load_user(user_id):
 
 ## Routes ##
 
-@app.route("/")
+@app.route("/", methods=['GET','POST'])
 def main():
+    print("en main")
     return render_template('index.html')
+
+
+@app.route("/index", methods=['GET','POST'])
+def main_redirect():
+    return render_template('index.html')
+
 
 @app.route('/showsignup')
 def signup():
@@ -145,37 +152,22 @@ def home():
 
 
 
-# @app.route('/home', methods=['POST','GET'])
-# def home():
-#
-#     if request.method == 'GET':
-#         return render_template('signin.html')
-#
-#
-#
-#     tok = request.form['token']
-#     print("sesiontoken: " + str(session.get(tok)))
-#     print("tok:" + str(tok))
-#     if session.get(tok):
-#         return json.dumps(1)
-#     else:
-#         return json.dumps(2)
-
-
-
 @app.route('/logout', methods=['GET','POST'])
 def logout():
+    if request.method == 'GET':
+        return json.dumps("logout done")
+    print("cookie:" + request.headers.get('Cookie'))
     session.pop('user', None)
-    return redirect('/')
+    return json.dumps("logout done")
 
 @app.route('/error')
 def error():
-    return render_template('error.html')
+    return render_template("error.html", code=302)
 
-@app.route("/vis")
-def vis():
-    return json.dumps(1)
 
+
+
+# Routes
 
 @app.route('/getallnames', methods=['GET'])
 def getallnames():

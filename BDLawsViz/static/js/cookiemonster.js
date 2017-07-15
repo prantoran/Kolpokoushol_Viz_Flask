@@ -1,4 +1,6 @@
 
+var allPaths = ['home','','logout','index'];
+
 function setCookie(cname, cvalue, exdays, cpath = []) {
     var d = new Date();
     d.setTime(d.getTime() + (exdays*24*60*60*1000));
@@ -46,27 +48,27 @@ function checkCookie() {
 }
 
 function removeCookie(cname) {
-    var cvalue = getCookie(cname);
-    if (cvalue == "") {
-        console.log("error: tried to logout an non-existing user");
-    } else {
-
-        setCookie(cname, "", -1);
+    document.cookie = cname + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    var n = allPaths.length;
+    for(var i = 0; i < n; i ++ ) {
+        document.cookie = cname + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/'+allPaths[i]+';';
 
     }
 }
 
-function delete_cookie( name ) {
-  document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-}
 
 function deleteAllCookies() {
     var cookies = document.cookie.split(";");
-
+    
     for (var i = 0; i < cookies.length; i++) {
         var cookie = cookies[i];
         var eqPos = cookie.indexOf("=");
         var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
-        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        removeCookie(name);
     }
+}
+
+// returns javascript array of objects
+function getAllEventCookies() {
+
 }
