@@ -25,7 +25,8 @@ function setNetworkSearchJqueryClick() {
                     'response': {},
                     'query_params': {
                         'query': keyword,
-                        'ngram': 0
+                        'ngram': 0,
+                        'exclude_unigram': 1
                     },
                     'is_error': false,
                     'error': ""

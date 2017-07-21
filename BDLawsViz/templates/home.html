@@ -13,7 +13,7 @@
 
     <script src="static/lib/jquery-3.2.1.js"></script>
     <script src="static/lib/d3.js"></script>
-    <script src="http://d3js.org/d3-selection-multi.v1.js"></script>
+    <!--<script src="http://d3js.org/d3-selection-multi.v1.js"></script> -->
 
     <!-- <script src="//d3js.org/d3.v3.min.js"></script>-->
 
@@ -75,121 +75,119 @@
 
     <div id="viz">
 
-        </div>
+    </div>
 
-        <div id="mySidenav" class="sidenav">
-            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+    <div id="mySidenav" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
 
-            <a href="#" onclick="clearVisualization()">Clear Visuation</a>
-
-
-            <a href="/logout" >Reload Visuation</a>
+        <a href="#" onclick="clearVisualization()">Clear Visuation</a>
 
 
-            <footer class="footer">
-                <a href="#">
-                    <p>&copy; KolpoKoushol 2017</p>
-                </a>
-            </footer>
-        </div>
+        <a href="/logout" >Reload Visuation</a>
 
 
-        <div class = "sidenav" id = "mySearchBar">
-            <div>
-                <a href="javascript:void(0)" class="closebtn" onclick="closeMySearchBar()">&times;</a>
-
-                 <a id = "spreadButton" href="javascript:void(0)" class="spreadbtn" onclick="spreadMySearchBar()">&raquo;</a>
-
-                 <a id = "shrinkButton" href="javascript:void(0)" class="shrinkbtn" onclick="shrinkMySearchBar()">&laquo;</a>
-
-                <form id = "searchText_form">
-                    <table>
-                        <tr>
-                            <td><a id="searchTextLabel" href="#"></a></td>
-
-                        </tr>
-                        </tr>
-                            <td>
-                                <input  id="sT"
-                                        type="text"
-                                        name="searchText"
-                                        onkeydown = "if (event.keyCode == 13)
-                                            document.getElementById('sidePaneButton').click()"
-                                >
-
-                            </td>
-                        </tr>
-
-                        </tr>
-                            <td>
-
-                                <input type="button" id = "sidePaneButton" class="buttons" name="searchButton" value="Search" >
-
-                                <input type="button" id = "sidePaneClearButton" class="buttons" name="clearSearchButton" value="Clear" onclick="clearSearch()">
+        <footer class="footer">
+            <a href="#">
+                <p>&copy; KolpoKoushol 2017</p>
+            </a>
+        </footer>
+    </div>
 
 
-                            </td>
-                        </tr>
-                    </table>
-                </form>
+    <div class = "sidenav" id = "mySearchBar">
+        <div>
+            <a href="javascript:void(0)" class="closebtn" onclick="closeMySearchBar()">&times;</a>
 
+             <a id = "spreadButton" href="javascript:void(0)" class="spreadbtn" onclick="spreadMySearchBar()">&raquo;</a>
 
+             <a id = "shrinkButton" href="javascript:void(0)" class="shrinkbtn" onclick="shrinkMySearchBar()">&laquo;</a>
 
-            </div>
-            <div id = "queryOutputBlock">
-            </div>
-
-            <footer class="footer">
-                <a href="#">
-                    <p>&copy; KolpoKoushol 2017</p>
-                </a>
-            </footer>
-
-        </div>
-
-
-        <div id = "leftBar" class="sidenav">
-            <div>
-                <a href="javascript:void(0)" class="closebtn" onclick="shrinkNavBar()">&times;</a>
-
-                <a id="homeusernametitle" href="javascript:void(0)">"test"</a>
-
+            <form id = "searchText_form">
                 <table>
                     <tr>
+                        <td><a id="searchTextLabel" href="#"></a></td>
+
+                    </tr>
+                    </tr>
                         <td>
-                            <input id="leftButtons" style="width:100%;" type = button class = "buttons" value = "Menu Pane" onclick="openNav()">
+                            <input  id="sT"
+                                    type="text"
+                                    name="searchText"
+                                    onkeydown = "if (event.keyCode == 13)
+                                        document.getElementById('sidePaneButton').click()"
+                            >
+
                         </td>
                     </tr>
-                    <tr>
-                        <td>
-                            <input id="leftBUttons2" style="width:100%;" type = button  class = "buttons" value = "Search Pane" onclick="openMySearchBar()">
-                        </td>
+
                     </tr>
-                    <tr>
                         <td>
-                            <input id="leftButtons3" style="width:100%;" type = button  class = "buttons" value = "Network Search Pane" onclick="openMyNetworkSearchBar()">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input id="btnSignOut" style="width:100%;" type = button  class = "buttons" value = "Sign Out"">
+
+                            <input type="button" id = "sidePaneButton" class="buttons success" name="searchButton" value="Search" >
+
+                            <input type="button" id = "sidePaneClearButton" class="buttons warning" name="clearSearchButton" value="Clear" onclick="clearSearch()">
+
+
                         </td>
                     </tr>
                 </table>
-            </div>
+            </form>
 
-            <footer class="footer">
-                <a href="#">
-                    <p>&copy; KolpoKoushol 2017</p>
-                </a>
-            </footer>
-        </div>
-        <div id = "navbarexpandbutton" >
-            <div>
-                <img src="static/res/r8arrow.png" onclick="expandNavBar()">
 
-            </div>
+
         </div>
+
+        <div id = "queryOutputBlock" class="scrolldiv">
+        </div>
+
+
+
+    </div>
+
+
+    <div id = "leftBar" class="sidenav">
+        <div>
+            <a href="javascript:void(0)" class="closebtn" onclick="shrinkNavBar()">&times;</a>
+
+            <a id="homeusernametitle" href="javascript:void(0)">"test"</a>
+
+            <table>
+                <tr style="position:relative;">
+                    <td>
+                        <input id="leftButtons"  style="width:100%;" type = button class = "buttons panelbtn success" value = "Menu" onclick="openNav()">
+                    </td>
+                </tr>
+                <tr style="position:relative;">
+                    <td>
+                        <input id="leftBUttons2" style="width:100%;" type = button  class = "buttons panelbtn success" value = "Search by ID" onclick="openMySearchBar()">
+                    </td>
+                </tr>
+                <tr style="position:relative;">
+                    <td>
+                        <input id="leftButtons3" style="width:100%;" type = button  class = "buttons panelbtn success" value = "Search by Phrase" onclick="openMyNetworkSearchBar()">
+                    </td>
+                </tr>
+                <tr style="position:relative;">
+                    <td>
+                        <input id="btnSignOut"   style="width:100%;" type = button  class = "buttons panelbtn warning" value = "Sign Out"">
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <footer class="footer">
+            <a href="#">
+                <p>&copy; KolpoKoushol 2017</p>
+            </a>
+        </footer>
+    </div>
+
+    <div id = "navbarexpandbutton" >
+        <div>
+            <img src="static/res/r8arrow.png" onclick="expandNavBar()">
+
+        </div>
+    </div>
 </body>
 
 </html>

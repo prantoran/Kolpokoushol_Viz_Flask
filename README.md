@@ -10,7 +10,8 @@
 
 ### Create Virtual Environment
 
-    $ virtualenv lawenv
+    $ virtualenv -p python3 lawenv
+
 
 ### Install packages
 

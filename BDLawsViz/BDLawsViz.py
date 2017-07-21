@@ -3,25 +3,29 @@ import os
 import itertools
 import spacy
 
-from flask import jsonify
 from pymongo import MongoClient
 from nltk.stem.porter import PorterStemmer
 from flask.ext.mysql import MySQL
+from flask.ext.cache import Cache
 from flask import Flask, request, json, session, g, redirect, url_for, abort, \
-     render_template, flash, session
+     render_template, flash, session, jsonify
 
-from flask.ext.login import LoginManager, UserMixin, \
-                                login_required, login_user, logout_user
-
-import random
-import sys
 
 app = Flask(__name__) # create the application instance :)
+
+
+# Cache
+cache = Cache(app,config={'CACHE_TYPE': 'simple'})
+
+SEC_IN_HOUR = 60*60
+SEC_IN_DAY = 60*60*24
+LAW_COUNT = 704
 
 # config
 app.config.update(
     DEBUG = True,
-    SECRET_KEY = 'secret_xxx'
+    SECRET_KEY = 'secret_xxx',
+    port = 5050,
 )
 
 app.secret_key = 'PizzaHut e onekdin pizza khai nai :3'
@@ -44,30 +48,23 @@ trigrams = db.trigrams
 stemmer = PorterStemmer()
 
 
-
-# flask-login
-login_manager = LoginManager()
-login_manager.init_app(app)
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.get(user_id)
-
-
 ## Routes ##
 
 @app.route("/", methods=['GET','POST'])
+@cache.cached(timeout=SEC_IN_HOUR)
 def main():
     print("en main")
     return render_template('index.html')
 
 
 @app.route("/index", methods=['GET','POST'])
+@cache.cached(timeout=SEC_IN_HOUR)
 def main_redirect():
     return render_template('index.html')
 
 
 @app.route('/showsignup')
+@cache.cached(timeout=SEC_IN_HOUR)
 def signup():
     return render_template('signup.html')
 
@@ -101,6 +98,7 @@ def signUp():
 
 
 @app.route('/showsignin')
+@cache.cached(timeout=SEC_IN_HOUR)
 def showsignin():
     return render_template('signin.html')
 
@@ -171,6 +169,11 @@ def error():
 
 @app.route('/getallnames', methods=['GET'])
 def getallnames():
+    ret = getallnames_mysql()
+    return ret
+
+@cache.cached(timeout=SEC_IN_HOUR, key_prefix='all_names')
+def getallnames_mysql():
     try:
         con = mysql.connect()
         cursor = con.cursor()
@@ -197,6 +200,12 @@ def getallnames():
 
 @app.route('/getalledges', methods=['GET'])
 def getalledges():
+    ret = getalledges_mysql()
+    return ret
+
+
+@cache.cached(timeout=SEC_IN_HOUR, key_prefix='all_edges')
+def getalledges_mysql():
     try:
         con = mysql.connect()
         cursor = con.cursor()
@@ -334,24 +343,55 @@ def search_indegree():
 @app.route('/search', methods=['GET'])
 def search():
     query = str(request.args.get('query', ''))
+    # Enforcing ngram search by default
     only_ngram_search = bool(int(request.args.get('ngram', True)))
-    ids = _search(query, only_ngram_search=only_ngram_search)
+
+    # Excluding the unigram by default
+
+    exclude_unigram = bool(int(request.args.get('exclude_unigram', True)))
+
+    ids = _search(query, only_ngram_search=only_ngram_search, exclude_unigram=exclude_unigram)
     # DEBUG_MSG
     # print("QUERY: {}\nONLY NGRAM SEARCH: {}".format(query, only_ngram_search))
-    print(ids)
-    print(type(ids))
     return jsonify({
         "ids" : ids,
         "id_count" : len(ids)
     })
 
+# Request pattern: http://localhost:5000/edge_detail?source=344&destination=7
+@app.route('/edge_detail', methods=['GET'])
+def edge_detail():
+    source_id = int(request.args.get('source', 344))
+    destination_id = int(request.args.get('destination', 86))
+
+    _edge_details = get_edge_detail(source_id, destination_id)
+
+    return json.dumps(_edge_details)
 
 
+
+
+
+# Returns edge detail on given source law id and destination law id
+@cache.memoize(timeout=SEC_IN_DAY)
+def get_edge_detail(source_id, destination_id):
+    # Edge data
+    edge_data = []
+
+    # Getting law dictionary
+    source = laws.find_one({'law_id': source_id})
+    destination = laws.find_one({'law_id': destination_id})
+
+    # This title will be searched through the law doc
+    try:
+        destination_title = destination['title'].lower()
+    except:
+        return []
 
 
 ## search_script.py
-
-def _search(text, only_ngram_search=True):
+@cache.memoize(timeout=SEC_IN_DAY)
+def _search(text, only_ngram_search=True, exclude_unigram=True):
     # Ids
     _ids = []
 
@@ -376,37 +416,59 @@ def _search(text, only_ngram_search=True):
     # DEBUG_MSG
     # print("WORD COUNT : {}".format(word_count))
 
+    # If strict ngram is turned on, exclude unigrams
+    if exclude_unigram == True:
 
-    # Make ngram then search
-    if (word_count > 1 and word_count < 4):
-        # Splitting the keywords into separate words
-        search_words = filtered_text.lower().split(' ')
+        sw = filtered_text.lower().split(' ')
 
-        # DEBUG_MSG
-        # print("SEARCH WORDS ", search_words)
+        search_combinations = ["_".join([word for word in combination]) for combination in
+                               itertools.permutations(sw, len(sw))]
 
-        # Creating combination of n-grams
-        search_combinations = ["_".join([word for word in combination]) for combination in itertools.permutations(search_words, len(search_words))]
+        for search_words in search_combinations:
+            for _id in range(1, LAW_COUNT):
+                bigram_text = bigrams.find_one({'law_id' : _id })['text']
+                trigram_text = trigrams.find_one({'law_id' : _id})['text']
 
-        for combination in search_combinations:
-            _ids.append(search_database(combination, ngram_search=True))
-
-
-        _ids = list(set(sum(_ids, [])))
-
-        # print("NGRAM _ ")
+                for btoken, ttoken in zip(bigram_text.split(' '), trigram_text.split(' ')):
+                    if '_' in btoken or '_' in ttoken:
+                        if search_words == btoken or search_words == ttoken:
+                            _ids.append(_id)
+        return list(set(_ids))
 
 
-    if only_ngram_search == False or word_count > 3:
-        all_key_search = search_database(filtered_text, ngram_search=False, delimiter=" ")
+    else:
 
-        # Concatening the list
-        _ids = _ids + all_key_search
+        # Make ngram then search
+        if (word_count > 1 and word_count < 4):
+            # Splitting the keywords into separate words
+            search_words = filtered_text.lower().split(' ')
 
-        # DEBUG_MSG
-        # print("ALL KEY SEARCH: {}".format(all_key_search))
+            # DEBUG_MSG
+            # print("SEARCH WORDS ", search_words)
 
-    return _ids
+            # Creating combination of n-grams
+            search_combinations = ["_".join([word for word in combination]) for combination in itertools.permutations(search_words, len(search_words))]
+
+            for combination in search_combinations:
+                _ids.append(search_database(combination, ngram_search=True))
+
+
+            _ids = list(set(sum(_ids, [])))
+
+            # print("NGRAM _ ")
+
+
+        if only_ngram_search == False or word_count > 3:
+            all_key_search = search_database(filtered_text, ngram_search=False, delimiter=" ")
+
+            # Concatening the list
+            _ids = _ids + all_key_search
+
+            # DEBUG_MSG
+            # print("ALL KEY SEARCH: {}".format(all_key_search))
+
+    return list(set(_ids))
+
 
 def search_database(text, ngram_search=True, delimiter='_'):
     _ids = []

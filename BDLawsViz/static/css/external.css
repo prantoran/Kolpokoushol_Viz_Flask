@@ -1,4 +1,9 @@
 
+html {
+    overflow: auto;
+}
+
+
 #body {
     position: relative;
 }
@@ -20,38 +25,79 @@
 }
 
 input.buttons{
-
-	background-color: #4CAF50;
+    outline: none;
     border: none;
-    color: white;
+    color: #DCDCDC;
     padding: 15px 32px;
     text-align: center;
     text-decoration: none;
-    display: inline-block;
     font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-    border-radius: 10%;
+    margin: 1% 1% 1% 1%;
+    border-radius: 5%;
 }
 input.buttons:hover{
-    opacity: 0.5;
+    color:white;
 }
 
+
+.success {background-color: #4CAF50;} /* Green */
+.success:hover {background-color: #46a049;}
+
+.warning {background-color: #ff9800;} /* Orange */
+.warning:hover {background: #e68a00;}
 
 #sT{
+    outline: none;
     position: relative;
-    left: 9%;
+    left: 5%;
+    right: 5%;
+    border-radius: 5%;
     width: 100%;
-
-
+    display:block;
 }
+
+.scrolldiv {
+    height: 70%;
+    overflow:auto;
+    margin-bottom: 5%;
+}
+
 
 #viz{
+    position: absolute;
 
-    transition: margin-left .5s;
-    margin-left: 0%;
-    width: 80%;
 }
+
+
+/*scrollbar*/
+::-webkit-scrollbar {
+    width:10px;
+    opacity: 0.2;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    opacity: 0.2;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    opacity: 0.2;
+    background:  rgba(112,112,112,0.7);
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+}
+::-webkit-scrollbar-thumb:window-inactive {
+    background: rgba(176,176,176,0.2);
+}
+
+/*scrollbar*/
+
+
 
 
 

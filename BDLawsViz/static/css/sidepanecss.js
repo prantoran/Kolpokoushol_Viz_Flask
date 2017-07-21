@@ -54,5 +54,10 @@ export default StyleSheet.create({
         "left": "0%",
         "fontSize": 36,
         "visibility": "hidden"
+    },
+    "sidenav panelbtn": {
+        "position": "relative",
+        "left": "5%",
+        "right": "5%"
     }
 });

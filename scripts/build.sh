@@ -1,11 +1,11 @@
 clear
 
-source ./lawenv/bin/activate
+source ./lawenv2/bin/activate
 
 pip install --editable .
 
 export FLASK_APP=BDLawsViz
 export FLASK_DEBUG=true
-flask run
+python -m flask run
 
-deactivate lawenv
+deactivate lawenv2

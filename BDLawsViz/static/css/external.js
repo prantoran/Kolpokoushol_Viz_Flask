@@ -6,6 +6,9 @@ const {width, height, scale} = Dimensions.get("window"),
     vmax = Math.max(vw, vh);
 
 export default StyleSheet.create({
+    "html": {
+        "overflow": "auto"
+    },
     "body": {
         "position": "relative"
     },
@@ -27,36 +30,73 @@ export default StyleSheet.create({
         "fontSize": 16
     },
     "inputbuttons": {
-        "backgroundColor": "#4CAF50",
+        "outline": "none",
         "border": "none",
-        "color": "white",
+        "color": "#DCDCDC",
         "paddingTop": 15,
         "paddingRight": 32,
         "paddingBottom": 15,
         "paddingLeft": 32,
         "textAlign": "center",
         "textDecoration": "none",
-        "display": "inline-block",
         "fontSize": 16,
-        "marginTop": 4,
-        "marginRight": 2,
-        "marginBottom": 4,
-        "marginLeft": 2,
-        "cursor": "pointer",
-        "borderRadius": "10%"
+        "marginTop": "1%",
+        "marginRight": "1%",
+        "marginBottom": "1%",
+        "marginLeft": "1%",
+        "borderRadius": "5%"
     },
     "inputbuttons:hover": {
-        "opacity": 0.5
+        "color": "white"
+    },
+    "success": {
+        "backgroundColor": "#4CAF50"
+    },
+    "success:hover": {
+        "backgroundColor": "#46a049"
+    },
+    "warning": {
+        "backgroundColor": "#ff9800"
+    },
+    "warning:hover": {
+        "background": "#e68a00"
     },
     "sT": {
+        "outline": "none",
         "position": "relative",
-        "left": "9%",
-        "width": "100%"
+        "left": "5%",
+        "right": "5%",
+        "borderRadius": "5%",
+        "width": "100%",
+        "display": "block"
+    },
+    "scrolldiv": {
+        "height": "70%",
+        "overflow": "auto",
+        "marginBottom": "5%"
     },
     "viz": {
-        "transition": "margin-left .5s",
-        "marginLeft": "0%",
-        "width": "80%"
+        "position": "absolute"
+    },
+    "::-webkit-scrollbar": {
+        "width": 10,
+        "opacity": 0.2
+    },
+    "::-webkit-scrollbar-track": {
+        "WebkitBoxShadow": "inset 0 0 6px rgba(0,0,0,0.3)",
+        "WebkitBorderRadius": 10,
+        "borderRadius": 10,
+        "opacity": 0.2
+    },
+    "::-webkit-scrollbar-thumb": {
+        "WebkitBorderRadius": 10,
+        "borderRadius": 10,
+        "opacity": 0.2,
+        "background": "rgba(112,112,112,0.7)",
+        "WebkitBoxShadow": "inset 0 0 6px rgba(0,0,0,0.5)"
+    },
+    "::-webkit-scrollbar-thumb:window-inactive": {
+        "background": "rgba(176,176,176,0.2)"
     },
     "options": {
         "float": "right"
