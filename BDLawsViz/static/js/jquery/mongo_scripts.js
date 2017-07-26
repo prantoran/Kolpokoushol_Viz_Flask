@@ -3,16 +3,30 @@
  */
 
 function searchByKeyword(ret, queryParams) {
-    console.log("queryParams:" + queryParams);
     return $.ajax({
         url: '/search'+queryParams,
         type: 'GET',
-        success: function (response) {
-            ret['response'] = response;
+        success: function (res) {
+            ret['response'] = res;
         },
-        error: function (error) {
+        error: function (err) {
             ret['is_error'] = true;
-            ret['error'] = error;
+            ret['error'] = err;
+        }
+    });
+}
+
+function searchLawNetworkID(ret, id) {
+    return $.ajax({
+        url: '/law_network'+'?id='+id,
+        type: 'GET',
+        success: function(res) {
+            ret.response = res;
+            console.log(res);
+        },
+        error: function (err) {
+            ret.is_error = true;
+            ret.error = err;
         }
     });
 }

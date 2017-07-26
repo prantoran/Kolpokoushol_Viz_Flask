@@ -1,0 +1,9 @@
+.nodeRick {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+.linkRick {
+  fill: none;
+  stroke: #bbb;
+}

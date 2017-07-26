@@ -19,6 +19,8 @@ cache = Cache(app,config={'CACHE_TYPE': 'simple'})
 
 SEC_IN_HOUR = 60*60
 SEC_IN_DAY = 60*60*24
+SEC_IN_MINUTE = 60
+CUR_CACHE_DURATION = SEC_IN_MINUTE
 LAW_COUNT = 704
 
 # config
@@ -45,26 +47,33 @@ client = MongoClient('localhost', 4000)
 db = client.law
 bigrams = db.bigrams
 trigrams = db.trigrams
+network = db.network
 stemmer = PorterStemmer()
 
 
 ## Routes ##
 
 @app.route("/", methods=['GET','POST'])
-@cache.cached(timeout=SEC_IN_HOUR)
+@cache.cached(timeout=CUR_CACHE_DURATION)
 def main():
     print("en main")
     return render_template('index.html')
 
 
+@app.route("/prac", methods=['GET','POST'])
+@cache.cached(timeout=CUR_CACHE_DURATION)
+def prac():
+    return render_template('prac.html')
+
+
 @app.route("/index", methods=['GET','POST'])
-@cache.cached(timeout=SEC_IN_HOUR)
+@cache.cached(timeout=CUR_CACHE_DURATION)
 def main_redirect():
     return render_template('index.html')
 
 
 @app.route('/showsignup')
-@cache.cached(timeout=SEC_IN_HOUR)
+@cache.cached(timeout=CUR_CACHE_DURATION)
 def signup():
     return render_template('signup.html')
 
@@ -98,7 +107,7 @@ def signUp():
 
 
 @app.route('/showsignin')
-@cache.cached(timeout=SEC_IN_HOUR)
+@cache.cached(timeout=CUR_CACHE_DURATION)
 def showsignin():
     return render_template('signin.html')
 
@@ -172,7 +181,7 @@ def getallnames():
     ret = getallnames_mysql()
     return ret
 
-@cache.cached(timeout=SEC_IN_HOUR, key_prefix='all_names')
+@cache.cached(timeout=CUR_CACHE_DURATION, key_prefix='all_names')
 def getallnames_mysql():
     try:
         con = mysql.connect()
@@ -204,7 +213,7 @@ def getalledges():
     return ret
 
 
-@cache.cached(timeout=SEC_IN_HOUR, key_prefix='all_edges')
+@cache.cached(timeout=CUR_CACHE_DURATION, key_prefix='all_edges')
 def getalledges_mysql():
     try:
         con = mysql.connect()
@@ -340,6 +349,27 @@ def search_indegree():
 
 ## Search Routes
 
+@app.route('/law_network', methods=['GET'])
+def get_inner_viz():
+    law_id = int(request.args.get('id', 1))
+    print("law_id:"+str(law_id))
+    data = get_inner_law_detail(law_id)
+
+    return jsonify({
+        'id' : law_id,
+        'nodes' : data['nodes'],
+        'links' : data['edges']
+    })
+
+
+# Returns inner law detail
+@cache.memoize(timeout=CUR_CACHE_DURATION)
+def get_inner_law_detail(law_id):
+    data = network.find_one({'law_id' : law_id})
+    return data
+
+
+
 @app.route('/search', methods=['GET'])
 def search():
     query = str(request.args.get('query', ''))
@@ -373,7 +403,7 @@ def edge_detail():
 
 
 # Returns edge detail on given source law id and destination law id
-@cache.memoize(timeout=SEC_IN_DAY)
+@cache.memoize(timeout=CUR_CACHE_DURATION)
 def get_edge_detail(source_id, destination_id):
     # Edge data
     edge_data = []
@@ -390,7 +420,7 @@ def get_edge_detail(source_id, destination_id):
 
 
 ## search_script.py
-@cache.memoize(timeout=SEC_IN_DAY)
+@cache.memoize(timeout=CUR_CACHE_DURATION)
 def _search(text, only_ngram_search=True, exclude_unigram=True):
     # Ids
     _ids = []

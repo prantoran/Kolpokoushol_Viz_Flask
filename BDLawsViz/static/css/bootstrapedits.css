@@ -1,0 +1,6 @@
+body .modal-admin {
+    /* new custom width */
+    width: 1200px;
+    /* must be half of the width, minus scrollbar on the left (30px) */
+
+}

@@ -356,6 +356,14 @@ function configureNodes(graph) {
     addEventToCookie(eventObj,1);
 
 
+    // showNodeToolTip(d);
+    processHomeModal(d);
+
+  });
+}
+
+
+function showNodeToolTip(d) {
     if (tip) tip.remove();
 
     tip  = svg.append("g")
@@ -402,5 +410,4 @@ function configureNodes(graph) {
     var bbox = tip.node().getBBox();
     rect.attr("width", bbox.width + 5)
         .attr("height", bbox.height + 5)
-  });
 }
