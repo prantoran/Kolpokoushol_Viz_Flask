@@ -61,7 +61,7 @@ function generateRickForceField(graphRick) {
         linksRick.push({source: s, target: i}, {source: i, target: t});
         bilinksRick.push([s,i,t]);
     }
-
+    console.log(bilinksRick);
     linkRick = svgRick.selectAll(".link")
                     .data(bilinksRick)
                     .enter().append("path")
@@ -94,8 +94,6 @@ function generateRickForceField(graphRick) {
             linkRick.attr("d", positionLinkRick);
 
             nodeRick.attr("transform", positionNodeRick);
-                    //.attr("cx", function(d) {return d.x = Math.max(cr,Math.min(widthRick-cr,d.x));})
-                    //.attr("cy", function(d) {return d.y = Math.max(cr, Math.min(heightRick-cr,d.y));});
     }
 }
 function positionLinkRick(d) {
@@ -105,7 +103,9 @@ function positionLinkRick(d) {
 }
 
 function positionNodeRick(d) {
-  return "translate(" + d.x + "," + d.y + ")";
+    d.x = Math.max(cr,Math.min(widthRick-cr,d.x));
+    d.y = Math.max(cr, Math.min(heightRick-cr,d.y));
+    return "translate(" + d.x + "," + d.y + ")";
 }
 
 function dragstartedRick(d) {
