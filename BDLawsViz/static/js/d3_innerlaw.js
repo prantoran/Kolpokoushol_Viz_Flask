@@ -4,6 +4,7 @@ var svgRick, colorRick, widthRick, heightRick;
 var linkRick, nodeRick;
 var simulationRick;
 var cr = 10;
+var el = 10;
 var nodeByIdRick, nodeByIdRick, linksRick, bilinksRick;
 
 function resetRick() {
@@ -39,7 +40,7 @@ function generateRickForceField(graphRick) {
     colorRick = d3.scaleOrdinal(d3.schemeCategory20);
 
     simulationRick = d3.forceSimulation()
-    .force("link", d3.forceLink().distance(5).strength(0.5))
+    .force("link", d3.forceLink().distance(el).strength(0.5))
     .force("charge", d3.forceManyBody())
     .force("center", d3.forceCenter(widthRick / 2, heightRick / 2));
 
@@ -49,19 +50,17 @@ function generateRickForceField(graphRick) {
     bilinksRick = [];
 
 
-    linksRick.forEach(function(l) {
+    var nlenRick = linksRick.length;
+
+    for( var j = 0; j < nlenRick; j ++ ) {
+        var l = linksRick[j];
         var s = l.source = nodeByIdRick.get(l.source),
             t = l.target = nodeByIdRick.get(l.target),
             i = {};
         nodesRick.push(i);
         linksRick.push({source: s, target: i}, {source: i, target: t});
         bilinksRick.push([s,i,t]);
-    });
-
-
-
-
-
+    }
 
     linkRick = svgRick.selectAll(".link")
                     .data(bilinksRick)

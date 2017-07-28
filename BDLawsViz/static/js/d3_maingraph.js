@@ -82,21 +82,27 @@ function visualizeForceField(graph, minRadius, searchFlag, coolArrowFlag) {
     width = +svg.attr("width"),
     height = +svg.attr("height");
 
-    graph.nodes.forEach(function(d) {
+    var nlen = graph.nodes.length;
+
+    for( var i = 0; i < nlen; i ++ ) {
+        var d = graph.nodes[i];
         if( (Math.sqrt(minRadiusSQ + inDegreeSize[d.id]) ) > minRadius) {
             d.radius = Math.floor(Math.sqrt(minRadiusSQ + inDegreeSize[d.id]) );
         }
         else {
             d.radius = minRadius;
         }
-    });
+    }
 
-    graph.links.forEach(function(d){
+    nlen = graph.links.length;
+
+    for( var i = 0; i < nlen; i ++ ) {
+        var d = graph.links[i];
         d.forceLinkDistance = Math.max(ld, dtb*(((mx-mn+1)-d.value+db)/(mx-mn+1)) );
         d.title = d.source.toString() + " -> "+d.target.toString();
         d.linkWidth = Math.sqrt(minRadius + d.value);
         d.opacity = Math.round( 10 * Math.max(Math.min(0.9, d.value/mx), 0.1) ) / 10;
-    });
+    }
 
     if(searchFlag) {
 
