@@ -1,6 +1,19 @@
 body .modal-admin {
     /* new custom width */
-    width: 1200px;
+    width: 99vw;
     /* must be half of the width, minus scrollbar on the left (30px) */
 
+    height: 70vh;
+}
+
+.modal-dialog {
+    /*overflow-y : initial !important;*/
+}
+.modal-body {
+    /*height:70vh;*/
+}
+
+.modal-scrolldiv {
+    height: 70vh;
+    overflow-y: auto;
 }

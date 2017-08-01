@@ -7,6 +7,13 @@ const {width, height, scale} = Dimensions.get("window"),
 
 export default StyleSheet.create({
     "body modal-admin": {
-        "width": 1200
+        "width": 99 * vw,
+        "height": 70 * vh
+    },
+    "modal-dialog": {},
+    "modal-body": {},
+    "modal-scrolldiv": {
+        "height": 70 * vh,
+        "overflowY": "auto"
     }
 });

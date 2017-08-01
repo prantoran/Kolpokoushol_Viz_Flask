@@ -6,4 +6,20 @@
 .linkRick {
   fill: none;
   stroke: #bbb;
+  stroke-width: 7px;
+}
+
+.svg_frame {
+    border: 2px solid #bbb;
+
+}
+
+
+.inner_phrase {
+    border: 1px solid #bbb;
+    margin: 1em;
+}
+
+.highlight {
+    background-color: yellow;
 }

@@ -35,9 +35,9 @@ function neighboring(a, b) {
     return edgeGrid[a.id][b.id] ? 1: 0;
 }
 
-function connectedNodes() {
+function connectedNodes(d) {
     if (toggle == 0) {
-        d = d3.select(this).node().__data__;
+        // d = d3.select(this).node().__data__;
         node.style("opacity", function (o) {
             return neighboring(d, o) | neighboring(o, d) ? 0.8 : 0.1;
         });
@@ -346,25 +346,23 @@ function configureNodes(graph) {
         .on("start", dragstarted)
         .on("drag", dragged)
         .on("end", dragended))
-        .on('dblclick', connectedNodes);;
+
 
   node.append("title")
       .text(function(d) { return d.name; });
 
   node.on("click", function(d){
-
     eventObj = {
         type: EVENT_NODE,
         id: d.id
     }
-    console.log(eventObj);
-
     addEventToCookie(eventObj,1);
+    connectedNodes(d);
+  });
 
-
-    // showNodeToolTip(d);
-    processHomeModal(d);
-
+  node.on("dblclick", function(d) {
+      // showNodeToolTip(d);
+      processHomeModal(d);
   });
 }
 

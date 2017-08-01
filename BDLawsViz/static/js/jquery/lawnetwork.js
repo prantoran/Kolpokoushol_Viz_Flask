@@ -26,7 +26,10 @@ function processHomeModal(d) {
             }
 
             validationRick(graphRick, ret2.response);
-            generateRickForceField(graphRick);
+
+            $("#homeModalLeftCol").html(GenerateParagraphs(graphRick));
+
+            generateRickForceField(graphRick, 1);
             $("#homeModal").modal('show');
         });
     }
@@ -56,4 +59,17 @@ function validationRick(g, h) {
         };
         g.nodes.push(p);
     });
+}
+
+function GenerateParagraphs(g) {
+    var ret = '';
+    var nlen = g.links.length;
+    for(var i = 0 ; i < nlen; i ++ ) {
+        var cur = '<p id="edgeinfo_'+i.toString()+'" class="inner_phrase" >';
+        //console.log(g.links[i].title);
+        cur += g.links[i].title || "";
+        cur += '</p>';
+        ret += cur;
+    }
+    return ret;
 }

@@ -12,6 +12,20 @@ export default StyleSheet.create({
     },
     "linkRick": {
         "fill": "none",
-        "stroke": "#bbb"
+        "stroke": "#bbb",
+        "strokeWidth": 7
+    },
+    "svg_frame": {
+        "border": "2px solid #bbb"
+    },
+    "inner_phrase": {
+        "border": "1px solid #bbb",
+        "marginTop": 1,
+        "marginRight": 1,
+        "marginBottom": 1,
+        "marginLeft": 1
+    },
+    "highlight": {
+        "backgroundColor": "yellow"
     }
 });
